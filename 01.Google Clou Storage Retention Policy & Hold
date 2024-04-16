@@ -1,0 +1,47 @@
+=> environment variable named Cloud Storage_BUCKET and use your Project ID as the bucket name.
+export BUCKET=$(gcloud config get-value project)
+
+=> Create Bucket
+gsutil mb "gs://$BUCKET"
+
+Define a Retention Policy
+-------------------------
+gsutil retention set 10s "gs://$BUCKET"
+
+=> verify Retention Policy
+gsutil retention get "gs://$BUCKET"
+
+=> Add a transaction record object to test it:
+gsutil cp gs://spls/gsp297/dummy_transactions "gs://$BUCKET/"
+
+=> Review the retention expiration
+gsutil ls -L "gs://$BUCKET/dummy_transactions"
+
+=> Lock the Retention Policy
+gsutil retention lock "gs://$BUCKET/"
+
+=> press Y
+
+Temporary hold
+--------------
+gsutil retention temp set "gs://$BUCKET/dummy_transactions"
+
+gsutil rm "gs://$BUCKET/dummy_transactions"
+
+gsutil retention temp release "gs://$BUCKET/dummy_transactions"
+
+gsutil rm "gs://$BUCKET/dummy_transactions"
+
+Event-based holds
+-----------------
+gsutil retention event-default set "gs://$BUCKET/"
+
+gsutil cp gs://spls/gsp297/dummy_loan "gs://$BUCKET/"
+
+gsutil ls -L "gs://$BUCKET/dummy_loan"
+
+gsutil retention event release "gs://$BUCKET/dummy_loan"
+
+gsutil ls -L "gs://$BUCKET/dummy_loan"
+
+gsutil rb "gs://$BUCKET/"
